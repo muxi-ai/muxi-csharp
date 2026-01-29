@@ -59,6 +59,11 @@ public class FormationClient : IDisposable
         return _transport.StreamSseAsync("POST", "/chat", body: body, useAdmin: false, userId: userId, ct: ct);
     }
     public Task<JsonNode?> AudioChatAsync(object payload, string userId = "", CancellationToken ct = default) => _transport.RequestAsync("POST", "/audiochat", body: payload, useAdmin: false, userId: userId, ct: ct);
+    public IAsyncEnumerable<SseEvent> AudioChatStreamAsync(object payload, string userId = "", CancellationToken ct = default)
+    {
+        var body = new Dictionary<string, object>((payload as IDictionary<string, object>) ?? new Dictionary<string, object>()) { ["stream"] = true };
+        return _transport.StreamSseAsync("POST", "/audiochat", body: body, useAdmin: false, userId: userId, ct: ct);
+    }
 
     // Sessions / requests
     public Task<JsonNode?> GetSessionsAsync(string userId, int? limit = null, CancellationToken ct = default) => _transport.RequestAsync("GET", "/sessions", new() { ["user_id"] = userId, ["limit"] = limit }, useAdmin: false, userId: userId, ct: ct);
