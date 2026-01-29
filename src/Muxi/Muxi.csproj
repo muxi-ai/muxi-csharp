@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     
     <PackageId>Muxi</PackageId>
-    <Version>0.20260129.0</Version>
+    <Version>0.1.0-preview</Version>
     <Authors>MUXI AI</Authors>
     <Company>MUXI AI</Company>
     <Description>MUXI .NET SDK - Manage AI agent formations and interact with their runtime APIs</Description>
