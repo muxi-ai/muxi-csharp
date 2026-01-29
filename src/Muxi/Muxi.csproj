@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    
+    <PackageId>Muxi</PackageId>
+    <Version>0.20260129.0</Version>
+    <Authors>MUXI AI</Authors>
+    <Company>MUXI AI</Company>
+    <Description>MUXI .NET SDK - Manage AI agent formations and interact with their runtime APIs</Description>
+    <PackageTags>muxi;ai;sdk;agents;formations</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/muxi-ai/muxi-csharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/muxi-ai/muxi-csharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+*.nupkg
+TestResults/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
