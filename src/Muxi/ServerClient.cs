@@ -10,6 +10,7 @@ public class ServerConfig
     public int MaxRetries { get; init; } = 0;
     public int Timeout { get; init; } = 30;
     public bool Debug { get; init; } = false;
+    internal string? App { get; init; }  // Internal: for Console telemetry
 }
 
 public class ServerClient : IDisposable
@@ -24,7 +25,8 @@ public class ServerClient : IDisposable
             config.SecretKey,
             config.Timeout,
             config.MaxRetries,
-            config.Debug
+            config.Debug,
+            config.App
         );
     }
 

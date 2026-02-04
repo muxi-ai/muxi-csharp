@@ -13,6 +13,7 @@ public class FormationConfig
     public int MaxRetries { get; init; } = 0;
     public int Timeout { get; init; } = 30;
     public bool Debug { get; init; } = false;
+    internal string? App { get; init; }  // Internal: for Console telemetry
 }
 
 public class FormationClient : IDisposable
@@ -28,7 +29,8 @@ public class FormationClient : IDisposable
             config.ClientKey,
             config.Timeout,
             config.MaxRetries,
-            config.Debug
+            config.Debug,
+            config.App
         );
     }
 
@@ -152,8 +154,9 @@ internal class FormationTransport : IDisposable
     private readonly int _timeout;
     private readonly int _maxRetries;
     private readonly bool _debug;
+    private readonly string? _app;
 
-    public FormationTransport(string baseUrl, string? adminKey, string? clientKey, int timeout, int maxRetries, bool debug)
+    public FormationTransport(string baseUrl, string? adminKey, string? clientKey, int timeout, int maxRetries, bool debug, string? app = null)
     {
         _baseUrl = baseUrl.TrimEnd('/');
         _adminKey = adminKey?.Trim();
@@ -161,6 +164,7 @@ internal class FormationTransport : IDisposable
         _timeout = timeout;
         _maxRetries = maxRetries;
         _debug = debug || Environment.GetEnvironmentVariable("MUXI_DEBUG") == "1";
+        _app = app;
         _client = new HttpClient { Timeout = TimeSpan.FromSeconds(timeout) };
     }
 
@@ -181,6 +185,10 @@ internal class FormationTransport : IDisposable
                 if (body != null) request.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(body), System.Text.Encoding.UTF8, "application/json");
 
                 var response = await _client.SendAsync(request, ct);
+                
+                // Check for SDK updates (non-blocking, once per process)
+                VersionCheck.CheckForUpdates(response);
+                
                 if (!response.IsSuccessStatusCode)
                 {
                     var statusCode = (int)response.StatusCode;
@@ -262,6 +270,7 @@ internal class FormationTransport : IDisposable
             ["X-Muxi-Idempotency-Key"] = Guid.NewGuid().ToString(),
             ["Accept"] = accept
         };
+        if (!string.IsNullOrEmpty(_app)) headers["X-Muxi-App"] = _app;
         if (useAdmin)
         {
             if (string.IsNullOrEmpty(_adminKey)) throw new ArgumentException("admin key required");

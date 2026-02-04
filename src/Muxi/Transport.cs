@@ -16,8 +16,9 @@ public class Transport : IDisposable
     private readonly int _timeout;
     private readonly int _maxRetries;
     private readonly bool _debug;
+    private readonly string? _app;
 
-    public Transport(string baseUrl, string keyId, string secretKey, int timeout = 30, int maxRetries = 0, bool debug = false)
+    public Transport(string baseUrl, string keyId, string secretKey, int timeout = 30, int maxRetries = 0, bool debug = false, string? app = null)
     {
         _baseUrl = baseUrl.TrimEnd('/');
         _keyId = keyId?.Trim() ?? "";
@@ -25,6 +26,7 @@ public class Transport : IDisposable
         _timeout = timeout;
         _maxRetries = maxRetries;
         _debug = debug || Environment.GetEnvironmentVariable("MUXI_DEBUG") == "1";
+        _app = app;
         
         _client = new HttpClient { Timeout = TimeSpan.FromSeconds(timeout) };
     }
@@ -55,6 +57,9 @@ public class Transport : IDisposable
                 var response = await _client.SendAsync(request, cancellationToken);
                 var elapsed = (DateTime.UtcNow - startTime).TotalSeconds;
                 Log($"{method} {fullPath} -> {(int)response.StatusCode} ({elapsed:F3}s)");
+
+                // Check for SDK updates (non-blocking, once per process)
+                VersionCheck.CheckForUpdates(response);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -150,7 +155,7 @@ public class Transport : IDisposable
 
     private Dictionary<string, string> BuildHeaders(string method, string path, string accept = "application/json")
     {
-        return new Dictionary<string, string>
+        var headers = new Dictionary<string, string>
         {
             ["Authorization"] = Auth.BuildAuthHeader(_keyId, _secretKey, method, path),
             ["Content-Type"] = "application/json",
@@ -159,6 +164,8 @@ public class Transport : IDisposable
             ["X-Muxi-Client"] = $"dotnet/{Environment.Version}",
             ["X-Muxi-Idempotency-Key"] = Guid.NewGuid().ToString()
         };
+        if (!string.IsNullOrEmpty(_app)) headers["X-Muxi-App"] = _app;
+        return headers;
     }
 
     private static JsonNode? UnwrapEnvelope(JsonNode? obj)
