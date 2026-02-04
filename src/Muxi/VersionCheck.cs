@@ -17,7 +17,7 @@ internal static class VersionCheck
             _checked = true;
         }
 
-        if (!IsDevMode()) return;
+        if (NotificationsDisabled()) return;
 
         if (!response.Headers.TryGetValues("X-Muxi-SDK-Latest", out var values)) return;
         var latest = values.FirstOrDefault();
@@ -35,7 +35,7 @@ internal static class VersionCheck
         }
     }
 
-    private static bool IsDevMode() => Environment.GetEnvironmentVariable("MUXI_DEBUG") == "1";
+    private static bool NotificationsDisabled() => Environment.GetEnvironmentVariable("MUXI_SDK_VERSION_NOTIFICATION") == "0";
 
     private static string? GetCachePath()
     {
