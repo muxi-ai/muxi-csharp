@@ -13,6 +13,7 @@ public class FormationConfig
     public int MaxRetries { get; init; } = 0;
     public int Timeout { get; init; } = 30;
     public bool Debug { get; init; } = false;
+    public string Mode { get; init; } = "live";  // "live" (default) or "draft" for local dev
     internal string? App { get; init; }  // Internal: for Console telemetry
 }
 
@@ -137,7 +138,10 @@ public class FormationClient : IDisposable
         if (!string.IsNullOrEmpty(config.BaseUrl)) return config.BaseUrl.TrimEnd('/');
         if (!string.IsNullOrEmpty(config.Url)) return config.Url.TrimEnd('/') + "/v1";
         if (!string.IsNullOrEmpty(config.ServerUrl) && !string.IsNullOrEmpty(config.FormationId))
-            return $"{config.ServerUrl.TrimEnd('/')}/api/{config.FormationId}/v1";
+        {
+            var prefix = config.Mode == "draft" ? "draft" : "api";
+            return $"{config.ServerUrl.TrimEnd('/')}/{prefix}/{config.FormationId}/v1";
+        }
         throw new ArgumentException("must set BaseUrl, Url, or ServerUrl+FormationId");
     }
 
