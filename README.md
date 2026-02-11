@@ -1,6 +1,13 @@
 # MUXI .NET SDK
 
-Official .NET SDK for the MUXI AI platform.
+Official .NET SDK for [MUXI](https://muxi.ai) — infrastructure for AI agents.
+
+**Highlights**
+- Async/await with `HttpClient` transport
+- Built-in retries, idempotency, and typed errors
+- Streaming helpers for chat/audio and deploy/log tails
+
+> Need deeper usage notes? See the [User Guide](https://github.com/muxi-ai/muxi-csharp/blob/main/USER_GUIDE.md) for streaming, retries, and auth details.
 
 ## Requirements
 
