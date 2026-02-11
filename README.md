@@ -1,6 +1,6 @@
 # MUXI .NET SDK
 
-Official .NET SDK for [MUXI](https://muxi.ai) — infrastructure for AI agents.
+Official .NET SDK for [MUXI](https://muxi.org) — infrastructure for AI agents.
 
 **Highlights**
 - Async/await with `HttpClient` transport
