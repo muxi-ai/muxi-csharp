@@ -239,11 +239,10 @@ internal class FormationTransport : IDisposable
 
         string? currentEvent = null;
         var dataParts = new List<string>();
+        string? line;
 
-        while (!reader.EndOfStream)
+        while ((line = await reader.ReadLineAsync(ct)) != null)
         {
-            var line = await reader.ReadLineAsync(ct);
-            if (line == null) continue;
             if (line.StartsWith(":")) continue;
             if (string.IsNullOrEmpty(line))
             {
