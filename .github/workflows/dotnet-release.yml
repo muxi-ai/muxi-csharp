@@ -101,7 +101,7 @@ jobs:
         run: dotnet pack src/Muxi/Muxi.csproj -c Release -o ./nupkg
 
       - name: Publish to NuGet
-        run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.MUXI_SDK_NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
       - name: Commit version bump
         run: |
