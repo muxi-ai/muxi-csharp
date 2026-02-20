@@ -113,7 +113,7 @@ public class FormationClient : IDisposable
 
     // Overlord / LLM
     public Task<JsonNode?> GetOverlordConfigAsync(CancellationToken ct = default) => _transport.RequestAsync("GET", "/overlord", useAdmin: true, ct: ct);
-    public Task<JsonNode?> GetOverlordPersonaAsync(CancellationToken ct = default) => _transport.RequestAsync("GET", "/overlord/persona", useAdmin: true, ct: ct);
+    public Task<JsonNode?> GetOverlordSoulAsync(CancellationToken ct = default) => _transport.RequestAsync("GET", "/overlord/soul", useAdmin: true, ct: ct);
     public Task<JsonNode?> GetLlmSettingsAsync(CancellationToken ct = default) => _transport.RequestAsync("GET", "/llm/settings", useAdmin: true, ct: ct);
 
     // Triggers / SOP / Audit

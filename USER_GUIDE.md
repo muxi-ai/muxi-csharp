@@ -117,7 +117,7 @@ Error types: `AuthenticationException`, `AuthorizationException`, `NotFoundExcep
 | Identifiers | `GetUserIdentifiersForUserAsync`, `LinkUserIdentifierAsync`, `UnlinkUserIdentifierAsync` |
 | Triggers/SOP | `GetTriggersAsync`, `GetTriggerAsync`, `FireTriggerAsync`, `GetSopsAsync`, `GetSopAsync` |
 | Audit | `GetAuditLogAsync`, `ClearAuditLogAsync` |
-| Config | `GetStatusAsync`, `GetConfigAsync`, `GetFormationInfoAsync`, `GetAsyncConfigAsync`, `GetA2aConfigAsync`, `GetLoggingConfigAsync`, `GetLoggingDestinationsAsync`, `GetOverlordConfigAsync`, `GetOverlordPersonaAsync`, `GetLlmSettingsAsync` |
+| Config | `GetStatusAsync`, `GetConfigAsync`, `GetFormationInfoAsync`, `GetAsyncConfigAsync`, `GetA2aConfigAsync`, `GetLoggingConfigAsync`, `GetLoggingDestinationsAsync`, `GetOverlordConfigAsync`, `GetOverlordSoulAsync`, `GetLlmSettingsAsync` |
 | Streaming | `StreamEventsAsync`, `StreamLogsAsync`, `StreamRequestAsync` |
 | User | `ResolveUserAsync` |
 
