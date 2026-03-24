@@ -94,6 +94,9 @@ public class FormationClient : IDisposable
     public Task<JsonNode?> GetSchedulerJobAsync(string jobId, CancellationToken ct = default) => _transport.RequestAsync("GET", $"/scheduler/jobs/{jobId}", useAdmin: true, ct: ct);
     public Task<JsonNode?> CreateSchedulerJobAsync(string type, string schedule, string message, string userId, CancellationToken ct = default) => _transport.RequestAsync("POST", "/scheduler/jobs", body: new { type, schedule, message, user_id = userId }, useAdmin: true, ct: ct);
     public Task DeleteSchedulerJobAsync(string jobId, CancellationToken ct = default) => _transport.RequestAsync("DELETE", $"/scheduler/jobs/{jobId}", useAdmin: true, ct: ct);
+    public Task<JsonNode?> UpdateSchedulerJobAsync(string jobId, object updates, CancellationToken ct = default) => _transport.RequestAsync("PUT", $"/scheduler/jobs/{jobId}", body: updates, useAdmin: true, ct: ct);
+    public Task<JsonNode?> PauseSchedulerJobAsync(string jobId, CancellationToken ct = default) => _transport.RequestAsync("POST", $"/scheduler/jobs/{jobId}/pause", useAdmin: true, ct: ct);
+    public Task<JsonNode?> ResumeSchedulerJobAsync(string jobId, CancellationToken ct = default) => _transport.RequestAsync("POST", $"/scheduler/jobs/{jobId}/resume", useAdmin: true, ct: ct);
 
     // Async / logging / a2a
     public Task<JsonNode?> GetAsyncConfigAsync(CancellationToken ct = default) => _transport.RequestAsync("GET", "/async", useAdmin: true, ct: ct);
