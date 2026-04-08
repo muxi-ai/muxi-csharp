@@ -236,26 +236,35 @@ internal class FormationTransport : IDisposable
         foreach (var (key, value) in headers) request.Headers.TryAddWithoutValidation(key, value);
         if (body != null) request.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(body), System.Text.Encoding.UTF8, "application/json");
 
-        using var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+        using var streamClient = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+        using var response = await streamClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+        if (!response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync(ct);
+            ThrowError((int)response.StatusCode, responseBody, (int?)response.Headers.RetryAfter?.Delta?.Seconds);
+        }
         using var stream = await response.Content.ReadAsStreamAsync(ct);
         using var reader = new StreamReader(stream);
 
-        string? currentEvent = null;
-        var dataParts = new List<string>();
+        var parser = new SseEventParser();
         string? line;
 
         while ((line = await reader.ReadLineAsync(ct)) != null)
         {
-            if (line.StartsWith(":")) continue;
-            if (string.IsNullOrEmpty(line))
+            var evt = parser.ProcessLine(line);
+            if (evt is null)
             {
-                if (dataParts.Count > 0) yield return new SseEvent(currentEvent ?? "message", string.Join("\n", dataParts));
-                currentEvent = null;
-                dataParts.Clear();
                 continue;
             }
-            if (line.StartsWith("event:")) currentEvent = line[6..].Trim();
-            else if (line.StartsWith("data:")) dataParts.Add(line[5..].Trim());
+            SseEventParser.ThrowIfRouteError(evt);
+            yield return evt;
+        }
+
+        var finalEvent = parser.Flush();
+        if (finalEvent is not null)
+        {
+            SseEventParser.ThrowIfRouteError(finalEvent);
+            yield return finalEvent;
         }
     }
 
