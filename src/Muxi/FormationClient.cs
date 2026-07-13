@@ -54,6 +54,25 @@ public class FormationClient : IDisposable
     public Task SetSecretAsync(string key, string value, CancellationToken ct = default) => _transport.RequestAsync("PUT", $"/secrets/{key}", body: new { value }, useAdmin: true, ct: ct);
     public Task DeleteSecretAsync(string key, CancellationToken ct = default) => _transport.RequestAsync("DELETE", $"/secrets/{key}", useAdmin: true, ct: ct);
 
+    /// <summary>
+    /// Widgets from an <c>event: ui</c> stream frame; an empty array for other frames.
+    /// The runtime delivers the response envelope's optional <c>ui</c> array (options,
+    /// action_link, mcp_resource widgets) as a single <c>event: ui</c> SSE frame before
+    /// <c>event: done</c>. Unknown widget types should be ignored (progressive enhancement).
+    /// </summary>
+    public static JsonArray ParseUiWidgets(SseEvent evt)
+    {
+        if (evt.Event != "ui") return new JsonArray();
+        try
+        {
+            var parsed = JsonNode.Parse(evt.Data);
+            if (parsed is JsonObject obj && obj["ui"] is JsonArray ui)
+                return ui.DeepClone().AsArray();
+        }
+        catch (System.Text.Json.JsonException) { }
+        return new JsonArray();
+    }
+
     // Chat
     public Task<JsonNode?> ChatAsync(object payload, string userId = "", CancellationToken ct = default) => _transport.RequestAsync("POST", "/chat", body: payload, useAdmin: false, userId: userId, ct: ct);
     public IAsyncEnumerable<SseEvent> ChatStreamAsync(object payload, string userId = "", CancellationToken ct = default)
@@ -301,15 +320,17 @@ internal class FormationTransport : IDisposable
         return headers;
     }
 
-    private static JsonNode? UnwrapEnvelope(JsonNode? obj)
+    internal static JsonNode? UnwrapEnvelope(JsonNode? obj)
     {
         if (obj is not JsonObject jsonObj || !jsonObj.ContainsKey("data")) return obj;
         var data = jsonObj["data"];
         if (data is JsonObject dataObj)
         {
             var reqId = jsonObj["request"]?["id"]?.GetValue<string>() ?? jsonObj["request_id"]?.GetValue<string>();
+            var idempotencyKey = jsonObj["request"]?["idempotency_key"]?.GetValue<string>();
             var ts = jsonObj["timestamp"];
             if (reqId != null && !dataObj.ContainsKey("request_id")) dataObj["request_id"] = reqId;
+            if (idempotencyKey != null && !dataObj.ContainsKey("idempotency_key")) dataObj["idempotency_key"] = idempotencyKey;
             if (ts != null && !dataObj.ContainsKey("timestamp")) dataObj["timestamp"] = ts?.DeepClone();
             return dataObj;
         }

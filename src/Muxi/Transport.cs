@@ -167,13 +167,14 @@ public class Transport : IDisposable
         return headers;
     }
 
-    private static JsonNode? UnwrapEnvelope(JsonNode? obj)
+    internal static JsonNode? UnwrapEnvelope(JsonNode? obj)
     {
         if (obj is not JsonObject jsonObj || !jsonObj.ContainsKey("data"))
             return obj;
 
         var req = jsonObj["request"]?.AsObject();
         var requestId = req?["id"]?.GetValue<string>() ?? jsonObj["request_id"]?.GetValue<string>();
+        var idempotencyKey = req?["idempotency_key"]?.GetValue<string>();
         var ts = jsonObj["timestamp"];
         var data = jsonObj["data"];
 
@@ -181,6 +182,8 @@ public class Transport : IDisposable
         {
             if (requestId != null && !dataObj.ContainsKey("request_id"))
                 dataObj["request_id"] = requestId;
+            if (idempotencyKey != null && !dataObj.ContainsKey("idempotency_key"))
+                dataObj["idempotency_key"] = idempotencyKey;
             if (ts != null && !dataObj.ContainsKey("timestamp"))
                 dataObj["timestamp"] = ts?.DeepClone();
             return dataObj;
